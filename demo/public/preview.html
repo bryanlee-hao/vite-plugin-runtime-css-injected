@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lib Runtime Test Page</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1020;
+        --panel: rgba(15, 23, 42, 0.88);
+        --panel-border: rgba(148, 163, 184, 0.18);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #22c55e;
+        --accent-2: #38bdf8;
+        --danger: #fb7185;
+        --shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          "SF Mono", "Menlo", "Monaco", "Cascadia Mono", "Segoe UI Mono",
+          monospace;
+        background:
+          radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 30%),
+          radial-gradient(circle at top right, rgba(34, 197, 94, 0.16), transparent 24%),
+          linear-gradient(180deg, #020617 0%, #0f172a 100%);
+        color: var(--text);
+      }
+
+      .shell {
+        width: min(1400px, calc(100% - 32px));
+        margin: 24px auto;
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .sidebar {
+        padding: 20px;
+        position: sticky;
+        top: 24px;
+        align-self: start;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.1;
+      }
+
+      .subtle {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .meta {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .meta strong {
+        color: #f8fafc;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .field {
+        margin-top: 18px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      select {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 13px;
+        color: var(--text);
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .primary {
+        background: linear-gradient(135deg, var(--accent) 0%, #16a34a 100%);
+        color: #03120b;
+        box-shadow: 0 10px 24px rgba(34, 197, 94, 0.25);
+      }
+
+      .secondary {
+        background: rgba(56, 189, 248, 0.14);
+        color: #dff6ff;
+        border: 1px solid rgba(56, 189, 248, 0.16);
+      }
+
+      .ghost {
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--text);
+      }
+
+      .danger {
+        background: rgba(251, 113, 133, 0.14);
+        color: #ffe4ea;
+        border: 1px solid rgba(251, 113, 133, 0.22);
+      }
+
+      .section-title {
+        margin: 22px 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      .log {
+        margin-top: 10px;
+        padding: 14px;
+        min-height: 220px;
+        max-height: 320px;
+        overflow: auto;
+        border-radius: 14px;
+        background: rgba(2, 6, 23, 0.78);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .checks {
+        margin-top: 10px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .check-item {
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(2, 6, 23, 0.56);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .check-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .check-label {
+        font-size: 13px;
+        color: #f8fafc;
+      }
+
+      .check-state {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 66px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.12);
+      }
+
+      .check-state[data-state="pass"] {
+        color: #d1fae5;
+        background: rgba(34, 197, 94, 0.12);
+        border-color: rgba(34, 197, 94, 0.2);
+      }
+
+      .check-state[data-state="fail"] {
+        color: #fecdd3;
+        background: rgba(251, 113, 133, 0.12);
+        border-color: rgba(251, 113, 133, 0.2);
+      }
+
+      .check-state[data-state="pending"] {
+        color: #dbeafe;
+        background: rgba(56, 189, 248, 0.12);
+        border-color: rgba(56, 189, 248, 0.2);
+      }
+
+      .check-detail {
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+        word-break: break-word;
+      }
+
+      .hint {
+        margin-top: 10px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .stage {
+        padding: 16px;
+        min-height: calc(100vh - 48px);
+      }
+
+      .stage-frame {
+        min-height: calc(100vh - 80px);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background:
+          linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.96));
+        box-shadow: var(--shadow);
+      }
+
+      .stage-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.5);
+      }
+
+      .dots span:nth-child(1) {
+        background: #fb7185;
+      }
+
+      .dots span:nth-child(2) {
+        background: #f59e0b;
+      }
+
+      .dots span:nth-child(3) {
+        background: #4ade80;
+      }
+
+      #app {
+        height: calc(100vh - 132px);
+        background: #fff;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #d1fae5;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.18);
+      }
+
+      .badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .badge[data-state="idle"] {
+        color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.12);
+        border-color: rgba(148, 163, 184, 0.16);
+      }
+
+      .badge[data-state="error"] {
+        color: #fecdd3;
+        background: rgba(251, 113, 133, 0.12);
+        border-color: rgba(251, 113, 133, 0.18);
+      }
+
+      @media (max-width: 960px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="panel sidebar">
+        <p class="eyebrow">Lib Runtime Test</p>
+        <h1>preview.html test page</h1>
+        <p class="subtle">
+          A test page for validating runtime CSS injection and browser bundle
+          loading. It uses the same <code>init(config).mount()</code> flow as the
+          host app and supports <code>esm</code>, <code>iife</code>, and
+          <code>umd</code>.
+        </p>
+
+        <div class="meta">
+          <div><strong>Target:</strong> <code id="target-path">./lib/index.mjs</code></div>
+          <div><strong>Format:</strong> <code id="target-format">esm</code></div>
+          <div><strong>Container:</strong> <code>#app</code></div>
+          <div><strong>History:</strong> <code>hash</code></div>
+          <div><strong>Route:</strong> <code>#/demo</code></div>
+        </div>
+
+        <div class="field">
+          <label for="format-select">Bundle Format</label>
+          <select id="format-select">
+            <option value="esm">ESM: index.mjs</option>
+            <option value="iife">IIFE: index.iife.js</option>
+            <option value="umd">UMD: index.umd.js</option>
+          </select>
+        </div>
+
+        <div class="toolbar">
+          <button id="mount-btn" class="primary" type="button">Mount</button>
+          <button id="update-btn" class="secondary" type="button" disabled>
+            Toggle Theme
+          </button>
+          <button id="remount-btn" class="ghost" type="button">
+            Remount
+          </button>
+          <button id="unmount-btn" class="danger" type="button" disabled>
+            Unmount
+          </button>
+        </div>
+
+        <div class="section-title">Status</div>
+        <div id="status" class="badge" data-state="idle">Idle</div>
+
+        <div class="section-title">Checks</div>
+        <div id="checks" class="checks">
+          <div class="check-item">
+            <div class="check-head">
+              <div class="check-label">Bundle target resolved</div>
+              <div class="check-state" data-check-state="target" data-state="pending">Pending</div>
+            </div>
+            <div class="check-detail" data-check-detail="target">Waiting for bundle selection.</div>
+          </div>
+          <div class="check-item">
+            <div class="check-head">
+              <div class="check-label">Micro app mounted</div>
+              <div class="check-state" data-check-state="mounted" data-state="pending">Pending</div>
+            </div>
+            <div class="check-detail" data-check-detail="mounted">Click Mount or wait for auto mount.</div>
+          </div>
+          <div class="check-item">
+            <div class="check-head">
+              <div class="check-label">Runtime CSS injected</div>
+              <div class="check-state" data-check-state="styles" data-state="pending">Pending</div>
+            </div>
+            <div class="check-detail" data-check-detail="styles">Waiting for runtime style tags.</div>
+          </div>
+          <div class="check-item">
+            <div class="check-head">
+              <div class="check-label">Root container rendered</div>
+              <div class="check-state" data-check-state="root" data-state="pending">Pending</div>
+            </div>
+            <div class="check-detail" data-check-detail="root">Waiting for DOM content under <code>#app</code>.</div>
+          </div>
+        </div>
+        <div class="hint">
+          This page is intended for manual verification of current build output.
+          Switch bundle format, remount, and inspect runtime logs below.
+        </div>
+
+        <div class="section-title">Runtime Log</div>
+        <div id="log" class="log"></div>
+      </aside>
+
+      <main class="stage">
+        <section class="stage-frame">
+          <div class="stage-bar">
+            <div class="dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div>Loaded from current lib build output</div>
+          </div>
+          <div id="app"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      const mountButton = document.querySelector("#mount-btn");
+      const updateButton = document.querySelector("#update-btn");
+      const remountButton = document.querySelector("#remount-btn");
+      const unmountButton = document.querySelector("#unmount-btn");
+      const formatSelect = document.querySelector("#format-select");
+      const statusNode = document.querySelector("#status");
+      const logNode = document.querySelector("#log");
+      const targetPathNode = document.querySelector("#target-path");
+      const targetFormatNode = document.querySelector("#target-format");
+      const microAppRootNode = document.querySelector("#app");
+      const checkStateNodes = {
+        target: document.querySelector('[data-check-state="target"]'),
+        mounted: document.querySelector('[data-check-state="mounted"]'),
+        styles: document.querySelector('[data-check-state="styles"]'),
+        root: document.querySelector('[data-check-state="root"]'),
+      };
+      const checkDetailNodes = {
+        target: document.querySelector('[data-check-detail="target"]'),
+        mounted: document.querySelector('[data-check-detail="mounted"]'),
+        styles: document.querySelector('[data-check-detail="styles"]'),
+        root: document.querySelector('[data-check-detail="root"]'),
+      };
+
+      let microApp;
+      let currentMode = "light";
+      let loadedScript;
+      const formatStorageKey = "lib-preview:selected-format";
+
+      const bundleManifest = {
+        esm: {
+          label: "esm",
+          fileName: "index.mjs",
+          loader: "module",
+        },
+        iife: {
+          label: "iife",
+          fileName: "index.iife.js",
+          loader: "global",
+          globalVarName: "testDemo",
+        },
+        umd: {
+          label: "umd",
+          fileName: "index.umd.js",
+          loader: "global",
+          globalVarName: "testDemo",
+        },
+      };
+
+      const getStoredFormat = () => {
+        const savedFormat = window.localStorage.getItem(formatStorageKey);
+        return savedFormat && bundleManifest[savedFormat] ? savedFormat : null;
+      };
+
+      const saveSelectedFormat = (format) => {
+        window.localStorage.setItem(formatStorageKey, format);
+      };
+
+      const getLibBasePath = () => {
+        const pathname = window.location.pathname;
+        return pathname.includes("/dist/lib/") || pathname.endsWith("/dist/lib/preview.html")
+          ? "./"
+          : "./lib/";
+      };
+
+      const getSelectedBundle = () => bundleManifest[formatSelect.value] ?? bundleManifest.esm;
+
+      const getSelectedBundlePath = () => `${getLibBasePath()}${getSelectedBundle().fileName}`;
+
+      const syncTargetInfo = () => {
+        const selected = getSelectedBundle();
+        targetPathNode.textContent = getSelectedBundlePath();
+        targetFormatNode.textContent = selected.label;
+      };
+
+      const setCheckState = (name, state, detail) => {
+        const stateNode = checkStateNodes[name];
+        const detailNode = checkDetailNodes[name];
+
+        if (stateNode) {
+          stateNode.dataset.state = state;
+          stateNode.textContent = state;
+        }
+
+        if (detailNode) {
+          detailNode.textContent = detail;
+        }
+      };
+
+      const writeLog = (message, detail) => {
+        const time = new Date().toLocaleTimeString("en-US", { hour12: false });
+        const block = [`[${time}] ${message}`];
+
+        if (detail !== undefined) {
+          block.push(
+            typeof detail === "string" ? detail : JSON.stringify(detail, null, 2),
+          );
+        }
+
+        logNode.textContent = `${block.join("\n")}\n\n${logNode.textContent}`.trim();
+      };
+
+      const setStatus = (text, state = "idle") => {
+        statusNode.textContent = text;
+        statusNode.dataset.state = state;
+      };
+
+      const setMountedState = (mounted) => {
+        mountButton.disabled = mounted;
+        updateButton.disabled = !mounted;
+        unmountButton.disabled = !mounted;
+        formatSelect.disabled = mounted;
+      };
+
+      const runChecks = () => {
+        const targetPath = getSelectedBundlePath();
+        const runtimeStyleNodes = Array.from(
+          document.querySelectorAll('style[data-runtime-css-injected="true"]'),
+        );
+        const runtimeStyleIds = runtimeStyleNodes
+          .map((node) => node.getAttribute("data-runtime-css-id"))
+          .filter(Boolean);
+        const renderedNodeCount = microAppRootNode
+          ? microAppRootNode.querySelectorAll("*").length
+          : 0;
+        const hasRootContent = microAppRootNode
+          ? microAppRootNode.children.length > 0 || microAppRootNode.textContent.trim().length > 0
+          : false;
+
+        setCheckState(
+          "target",
+          targetPath ? "pass" : "fail",
+          targetPath ? `Resolved to ${targetPath}` : "Bundle path is empty.",
+        );
+        setCheckState(
+          "mounted",
+          microApp ? "pass" : "pending",
+          microApp
+            ? `Micro app instance is active in ${getSelectedBundle().label} mode.`
+            : "Micro app is not mounted yet.",
+        );
+        setCheckState(
+          "styles",
+          runtimeStyleNodes.length > 0 ? "pass" : microApp ? "fail" : "pending",
+          runtimeStyleNodes.length > 0
+            ? `Found ${runtimeStyleNodes.length} runtime style tag(s): ${runtimeStyleIds.join(", ") || "no style id"}`
+            : microApp
+              ? "No runtime style tag with data-runtime-css-injected was found."
+              : "Waiting for mount before checking style injection.",
+        );
+        setCheckState(
+          "root",
+          hasRootContent ? "pass" : microApp ? "fail" : "pending",
+          hasRootContent
+            ? `Container rendered ${renderedNodeCount} descendant node(s).`
+            : microApp
+              ? "Mount completed but the root container is still empty."
+              : "Waiting for mount before checking rendered DOM.",
+        );
+      };
+
+      const getTheme = (mode) => ({
+        mode,
+        variables:
+          mode === "dark"
+            ? {
+                aiBaseColor: "#0f172a",
+                aiPrimaryColor: "#38bdf8",
+              }
+            : {
+                aiBaseColor: "#ffffff",
+                aiPrimaryColor: "#16a34a",
+              },
+      });
+
+      const createConfig = () => ({
+        container: "#app",
+        props: {
+          historyMode: "memory",
+          pageMode: "page",
+          includes: ["ALL"],
+          theme: getTheme(currentMode),
+        },
+        on(event, callback) {
+          writeLog(`listen event: ${event}`);
+          callback &&
+            window.setTimeout(() => {
+              writeLog(`event listener attached: ${event}`);
+            }, 0);
+        },
+      });
+
+      const cleanupLoadedScript = () => {
+        if (loadedScript) {
+          loadedScript.remove();
+          loadedScript = undefined;
+        }
+      };
+
+      const loadGlobalFactory = async (selected, targetPath) => {
+        cleanupLoadedScript();
+        delete window[selected.globalVarName];
+
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = targetPath;
+          script.async = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error(`Failed to load script: ${targetPath}`));
+          loadedScript = script;
+          document.head.appendChild(script);
+        });
+
+        const globalExport = window[selected.globalVarName];
+        const factory = globalExport?.init ?? globalExport?.default ?? globalExport;
+
+        if (typeof factory !== "function") {
+          throw new Error(`Cannot find init/default export from global ${selected.globalVarName}`);
+        }
+
+        return factory;
+      };
+
+      const loadFactory = async () => {
+        const selected = getSelectedBundle();
+        const targetPath = getSelectedBundlePath();
+
+        if (selected.loader === "module") {
+          const mod = await import(targetPath);
+          const factory = mod.init ?? mod.default;
+
+          if (typeof factory !== "function") {
+            throw new Error(`Cannot find init/default export from ${targetPath}`);
+          }
+
+          return factory;
+        }
+
+        return loadGlobalFactory(selected, targetPath);
+      };
+
+      const mountMicroApp = async () => {
+        try {
+          if (microApp) {
+            writeLog("mount skipped", "micro app is already mounted");
+            return;
+          }
+
+          setStatus("Mounting", "idle");
+          writeLog("loading module", {
+            format: getSelectedBundle().label,
+            target: getSelectedBundlePath(),
+          });
+          const factory = await loadFactory();
+          microApp = factory(createConfig());
+          await microApp.mount();
+          setMountedState(true);
+          setStatus("Mounted", "success");
+          runChecks();
+          writeLog("mount success", {
+            route: location.hash || "#/demo",
+            mode: currentMode,
+          });
+        } catch (error) {
+          console.error(error);
+          microApp = undefined;
+          setMountedState(false);
+          setStatus("Mount Failed", "error");
+          runChecks();
+          writeLog("mount failed", error?.stack || String(error));
+        }
+      };
+
+      const unmountMicroApp = () => {
+        if (!microApp) {
+          writeLog("unmount skipped", "micro app is not mounted");
+          return;
+        }
+
+        microApp.unmount();
+        microApp = undefined;
+        cleanupLoadedScript();
+        setMountedState(false);
+        setStatus("Unmounted", "idle");
+        runChecks();
+        writeLog("unmount success");
+      };
+
+      const updateTheme = () => {
+        if (!microApp) {
+          return;
+        }
+
+        currentMode = currentMode === "light" ? "dark" : "light";
+        microApp.update({
+          theme: getTheme(currentMode),
+        });
+        setStatus(`Updated: ${currentMode}`, "success");
+        runChecks();
+        writeLog("update success", { mode: currentMode });
+      };
+
+      mountButton.addEventListener("click", mountMicroApp);
+      updateButton.addEventListener("click", updateTheme);
+      formatSelect.addEventListener("change", () => {
+        saveSelectedFormat(formatSelect.value);
+        syncTargetInfo();
+        runChecks();
+        writeLog("format changed", {
+          format: getSelectedBundle().label,
+          target: getSelectedBundlePath(),
+        });
+      });
+      remountButton.addEventListener("click", async () => {
+        unmountMicroApp();
+        await mountMicroApp();
+      });
+      unmountButton.addEventListener("click", unmountMicroApp);
+
+      if (!location.hash) {
+        location.hash = "#/demo";
+      }
+
+      const savedFormat = getStoredFormat();
+      if (savedFormat) {
+        formatSelect.value = savedFormat;
+      }
+
+      syncTargetInfo();
+      runChecks();
+      writeLog("preview ready", "Click Mount or wait for auto mount.");
+      setMountedState(false);
+      mountMicroApp();
+    </script>
+  </body>
+</html>

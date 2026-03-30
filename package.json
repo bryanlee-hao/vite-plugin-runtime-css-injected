@@ -1,0 +1,57 @@
+{
+  "name": "vite-plugin-runtime-css-injected",
+  "version": "0.1.0",
+  "description": "Vite build plugins: legacy import.meta.url shim (Rolldown) and runtime CSS injection",
+  "type": "module",
+  "license": "MIT",
+  "author": "",
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "rolldown",
+    "import-meta-url",
+    "css-inject",
+    "css-in-js",
+    "runtime-css-injected",
+    "runtime-css-injected-plugin"
+  ],
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "scripts": {
+    "build": "tsup",
+    "prepare": "pnpm run build",
+    "prepublishOnly": "pnpm run build"
+  },
+  "peerDependencies": {
+    "vite": "^8.0.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.1",
+    "@types/node": "^22.14.0",
+    "tsup": "^8.5.0",
+    "typescript": "~5.8.0",
+    "vite": "^8.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.9.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bryanlee-hao/snumber"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
