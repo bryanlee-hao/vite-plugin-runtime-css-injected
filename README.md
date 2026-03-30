@@ -1,5 +1,9 @@
 # vite-plugin-runtime-css-injected
 
+[![npm version](https://img.shields.io/npm/v/vite-plugin-runtime-css-injected)](https://www.npmjs.com/package/vite-plugin-runtime-css-injected)
+[![gzip size](https://img.shields.io/badge/gzip-0.8kB-brightgreen)](https://github.com/bryanlee-hao/vite-plugin-runtime-css-injected)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/github/license/bryanlee-hao/vite-plugin-runtime-css-injected)
+
 [中文](./README.zh-CN.md) | [English](./README.md)
 
 A **Vite 8** plugin package for browser libraries and micro-frontend scenarios:
